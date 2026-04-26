@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -27,7 +28,6 @@ const generationSteps = [
 ];
 
 function ProgressScreen({ reelId }: { reelId: string }) {
-  const supabase = createClient();
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(2);
   const [progress, setProgress] = useState(35);
@@ -113,21 +113,27 @@ function ResultsScreen({ reelId }: { reelId: string }) {
   const router = useRouter();
   const [variants, setVariants] = useState<ReelVariant[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeVideo, setActiveVideo] = useState<ReelVariant | null>(null);
 
   useEffect(() => {
-    const fetchVariants = async () => {
+    let isMounted = true;
+    
+    async function loadVariants() {
       const { data } = await supabase
         .from("reel_variants")
         .select("*")
         .eq("reel_id", reelId);
-      if (data) {
+      if (isMounted && data) {
         setVariants(data);
+        setLoading(false);
       }
-      setLoading(false);
+    }
+    
+    loadVariants();
+    
+    return () => {
+      isMounted = false;
     };
-    fetchVariants();
-  }, [reelId]);
+  }, [supabase, reelId]);
 
   const handleDownload = async (url: string, filename: string) => {
     const link = document.createElement("a");
@@ -191,10 +197,11 @@ function ResultsScreen({ reelId }: { reelId: string }) {
               <CardContent className="p-0">
                 <div className="aspect-video bg-muted relative">
                   {variant.thumbnail_url ? (
-                    <img
+                    <Image
                       src={variant.thumbnail_url}
                       alt={variant.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-4xl">
@@ -292,7 +299,7 @@ export default function ReelDetailPage() {
       const interval = setInterval(checkStatus, 5000);
       return () => clearInterval(interval);
     }
-  }, [reelId, status]);
+  }, [supabase, reelId, status]);
 
   return status === "processing" ? (
     <ProgressScreen reelId={reelId} />

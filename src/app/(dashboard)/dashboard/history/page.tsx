@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,10 +29,12 @@ export default function HistoryPage() {
   const [filter, setFilter] = useState<"all" | "ready" | "processing" | "failed">("all");
 
   useEffect(() => {
-    const fetchReels = async () => {
+    let isMounted = true;
+    
+    async function loadReels() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        router.push("/login");
+        if (isMounted) router.replace("/login");
         return;
       }
 
@@ -42,13 +45,18 @@ export default function HistoryPage() {
         .order("created_at", { ascending: false });
 
       const { data } = await query;
-      if (data) {
+      if (isMounted && data) {
         setReels(data);
+        setLoading(false);
       }
-      setLoading(false);
+    }
+    
+    loadReels();
+    
+    return () => {
+      isMounted = false;
     };
-    fetchReels();
-  }, []);
+  }, [supabase, router]);
 
   const filteredReels = reels.filter((reel) => {
     const matchesSearch =
@@ -122,12 +130,13 @@ export default function HistoryPage() {
               <Link key={reel.id} href={`/dashboard/reel/${reel.id}`}>
                 <Card className="border border-border hover:border-primary/50 transition-colors cursor-pointer">
                   <CardContent className="p-4 flex items-center gap-4">
-                    <div className="w-20 h-14 bg-muted rounded-sm overflow-hidden flex-shrink-0">
+                    <div className="w-20 h-14 bg-muted rounded-sm overflow-hidden flex-shrink-0 relative">
                       {reel.thumbnail_url ? (
-                        <img
+                        <Image
                           src={reel.thumbnail_url}
                           alt={reel.property_name}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-xl">

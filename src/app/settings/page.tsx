@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +19,7 @@ interface Profile {
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -34,25 +37,34 @@ export default function SettingsPage() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    let isMounted = true;
+    
+    async function loadProfile() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-        if (data) {
-          setProfile(data);
-          if (data.logo_url) {
-            setLogoPreview(data.logo_url);
-          }
-        }
+      if (!user) {
+        if (isMounted) router.replace("/login");
+        return;
       }
-      setLoading(false);
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+      if (isMounted && data) {
+        setProfile(data);
+        if (data.logo_url) {
+          setLogoPreview(data.logo_url);
+        }
+        setLoading(false);
+      }
+    }
+    
+    loadProfile();
+    
+    return () => {
+      isMounted = false;
     };
-    fetchProfile();
-  }, []);
+  }, [supabase, router]);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -138,12 +150,13 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-6">
-                  <div className="w-24 h-24 border-2 border-dashed border-border rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="w-24 h-24 border-2 border-dashed border-border rounded-lg flex items-center justify-center overflow-hidden relative">
                     {logoPreview ? (
-                      <img
+                      <Image
                         src={logoPreview}
                         alt="Logo"
-                        className="w-full h-full object-contain"
+                        fill
+                        className="object-contain"
                       />
                     ) : (
                       <span className="text-2xl text-muted-foreground">+</span>

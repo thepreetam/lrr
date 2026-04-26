@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,11 +58,29 @@ export default function OnboardingPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        let logoUrl = null;
+        
+        if (logo) {
+          const fileExt = logo.name.split(".").pop();
+          const fileName = `${user.id}/logo-${Date.now()}.${fileExt}`;
+          const { data: uploadData } = await supabase.storage
+            .from("logos")
+            .upload(fileName, logo);
+          
+          if (uploadData) {
+            const { data: urlData } = supabase.storage
+              .from("logos")
+              .getPublicUrl(fileName);
+            logoUrl = urlData.publicUrl;
+          }
+        }
+        
         await supabase.from("profiles").upsert({
           id: user.id,
           full_name: profile.fullName,
           agency: profile.agency,
           phone: profile.phone,
+          logo_url: logoUrl,
           voice_setting: voice,
           completed_onboarding: true,
         });
@@ -179,11 +198,12 @@ export default function OnboardingPage() {
                 <div className="space-y-4">
                   <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
                     {logoPreview ? (
-                      <div className="space-y-4">
-                        <img
+                      <div className="relative h-24 w-full">
+                        <Image
                           src={logoPreview}
                           alt="Logo preview"
-                          className="max-h-24 mx-auto object-contain"
+                          fill
+                          className="object-contain"
                         />
                         <Button
                           variant="outline"

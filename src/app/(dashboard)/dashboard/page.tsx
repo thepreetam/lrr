@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,10 +29,12 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<Stats>({ videosThisMonth: 0, listingsCompleted: 0 });
 
   useEffect(() => {
-    const fetchData = async () => {
+    let isMounted = true;
+    
+    async function loadData() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        router.push("/login");
+        if (isMounted) router.replace("/login");
         return;
       }
 
@@ -42,7 +45,7 @@ export default function DashboardPage() {
         .order("created_at", { ascending: false })
         .limit(6);
 
-      if (reelsData) {
+      if (isMounted && reelsData) {
         setReels(reelsData);
         setStats({
           videosThisMonth: reelsData.filter(
@@ -50,11 +53,16 @@ export default function DashboardPage() {
           ).length,
           listingsCompleted: reelsData.filter((r) => r.status === "ready").length,
         });
+        setLoading(false);
       }
-      setLoading(false);
+    }
+    
+    loadData();
+    
+    return () => {
+      isMounted = false;
     };
-    fetchData();
-  }, []);
+  }, [supabase, router]);
 
   return (
     <div className="p-6 md:p-8">
@@ -136,10 +144,11 @@ export default function DashboardPage() {
                     <CardContent className="p-0">
                       <div className="aspect-video bg-muted relative">
                         {reel.thumbnail_url ? (
-                          <img
+                          <Image
                             src={reel.thumbnail_url}
                             alt={reel.property_name}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-4xl">

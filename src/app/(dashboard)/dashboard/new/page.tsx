@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -124,10 +125,11 @@ export default function NewReelPage() {
                     key={index}
                     className="aspect-square relative border border-border rounded-sm overflow-hidden group"
                   >
-                    <img
+                    <Image
                       src={preview}
                       alt={`Photo ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                     <button
                       type="button"

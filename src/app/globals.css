@@ -116,6 +116,14 @@
   --sidebar-accent-foreground: #1a1c1c;
   --sidebar-border: #e5e5e5;
   --sidebar-ring: #1a1a1a;
+  
+  /* Navy + Teal Luxury Theme */
+  --navy: #0a1628;
+  --navy-light: #1a2d4a;
+  --teal: #14b8a6;
+  --teal-light: #2dd4bf;
+  --teal-dark: #0d9488;
+  --gold: #d4af37;
 }
 
 .dark {
