@@ -3,66 +3,46 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { 
-  Crown, 
-  CheckCircle2, 
-  XCircle,
-  ArrowLeft,
-  HeadphonesIcon
-} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 const plans = [
   {
-    name: "Starter",
+    name: "Professional",
     price: 39,
     priceLabel: "$39",
-    interval: "per listing",
+    interval: "one-time",
     description: "Perfect for trying out the service",
     features: [
-      { text: "4 cinematic video reels", included: true },
-      { text: "Professional voiceover", included: true },
-      { text: "Auto-burned captions", included: true },
-      { text: "Royalty-free background music", included: true },
-      { text: "Agent branding overlay", included: true },
-      { text: "MP4 download", included: true },
-      { text: "Priority processing", included: false },
-      { text: "Voice cloning", included: false },
-      { text: "Unlimited generations", included: false },
+      { text: "5 Photos → 4 Cinematic Reels", included: true },
+      { text: "1080p export", included: true },
+      { text: "Full branding + captions + music", included: true },
+      { text: "One listing", included: true },
     ],
-    cta: "Get Started",
-    popular: false,
+    cta: "Buy $39 Pack — Instant Access",
+    popular: true,
     stripePriceId: "price_starter_onetime",
   },
   {
-    name: "Pro Monthly",
+    name: "Unlimited",
     price: 59,
     priceLabel: "$59",
-    interval: "per month",
+    interval: "mo",
     description: "For active real estate agents",
     features: [
-      { text: "Unlimited reel generations", included: true },
-      { text: "Priority processing", included: true },
-      { text: "Voice cloning access", included: true },
-      { text: "4 cinematic video reels", included: true },
-      { text: "Professional voiceover", included: true },
-      { text: "Auto-burned captions", included: true },
-      { text: "Royalty-free background music", included: true },
-      { text: "Agent branding overlay", included: true },
-      { text: "MP4 download", included: true },
-      { text: "Commercial license", included: true },
-      { text: "Priority support", included: true },
+      { text: "Unlimited generations", included: true },
+      { text: "Priority rendering", included: true },
+      { text: "Voice cloning", included: true },
+      { text: "Team seats (coming soon)", included: true },
     ],
-    cta: "Start Free Trial",
-    popular: true,
+    cta: "Start $59/mo — Cancel anytime",
+    popular: false,
     stripePriceId: "price_pro_monthly",
   },
 ];
 
 export default function PricingPage() {
   const router = useRouter();
-  
+
   const handlePurchase = async (priceId: string) => {
     const supabase = createClient();
     
@@ -93,16 +73,16 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[--navy] text-white">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold tracking-tight">
+      <header className="bg-white border-b border-zinc-300">
+        <div className="max-w-7xl mx-auto px-12 py-4 flex items-center justify-between">
+          <Link href="/" className="text-lg font-bold tracking-tight font-['Space_Grotesk']">
             LISTING REEL ROCKET
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/login">
-              <Button variant="ghost" className="text-white hover:text-[--teal] hover:bg-white/10">
+              <Button variant="ghost" className="text-zinc-400 hover:text-zinc-900">
                 Sign In
               </Button>
             </Link>
@@ -110,80 +90,61 @@ export default function PricingPage() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <Link href="/" className="inline-flex items-center text-white/60 hover:text-white mb-8">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to home
+      <div className="max-w-5xl mx-auto px-12 py-16">
+        <Link href="/" className="inline-flex items-center text-zinc-500 hover:text-zinc-900 mb-8 font-['Space_Grotesk'] uppercase text-[13px]">
+          ← Back to home
         </Link>
 
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Simple, Transparent Pricing</h1>
-          <p className="text-xl text-white/60 max-w-2xl mx-auto">
-            Choose the plan that fits your business. Upgrade or downgrade anytime.
+        <div className="text-center mb-16">
+          <h1 className="text-[48px] font-['Space_Grotesk'] font-light mb-4 uppercase" style={{ letterSpacing: '-0.02em' }}>Simple Pricing</h1>
+          <p className="text-zinc-500 max-w-2xl mx-auto font-['Inter']">
+            No contracts. No surprises. Just powerful videos.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 gap-12 mb-16">
           {plans.map((plan) => (
-            <Card 
+            <div 
               key={plan.name}
-              className={`relative bg-white/5 border-white/10 p-8 ${
-                plan.popular ? "border-[--teal] bg-gradient-to-br from-[--teal]/10 to-[--teal]/5" : ""
+              className={`relative p-12 bg-white flex flex-col ${
+                plan.popular ? "border-2 border-black" : "border border-zinc-300"
               }`}
             >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center gap-1 px-4 py-1 bg-[--teal] text-white text-sm font-medium rounded-full">
-                    <Crown className="w-4 h-4" />
-                    Most Popular
-                  </span>
+              <div className="mb-8">
+                <div className={`text-[12px] uppercase tracking-widest mb-2 font-['Inter'] ${plan.popular ? "text-black" : "text-zinc-500"}`}>
+                  {plan.name}
                 </div>
-              )}
-              
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-white/60 text-sm">{plan.description}</p>
-              </div>
-              
-              <div className="text-center mb-8">
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-5xl font-bold">{plan.priceLabel}</span>
-                  <span className="text-white/50">/{plan.interval}</span>
+                <div className="text-[48px] font-['Space_Grotesk'] font-light">
+                  ${plan.price}<span className="text-[24px]"> {plan.interval}</span>
                 </div>
               </div>
               
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-4 mb-12 flex-grow font-['Inter']">
                 {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    {feature.included ? (
-                      <CheckCircle2 className="w-5 h-5 text-[--teal] flex-shrink-0" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-white/30 flex-shrink-0" />
-                    )}
-                    <span className={feature.included ? "text-white" : "text-white/40"}>
-                      {feature.text}
-                    </span>
+                  <li key={i} className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">check</span>
+                    {feature.text}
                   </li>
                 ))}
               </ul>
               
               <Button
-                className={`w-full h-12 text-lg ${
+                className={`w-full py-4 font-['Space_Grotesk'] text-[24px] ${
                   plan.popular 
-                    ? "bg-[--teal] hover:bg-[--teal-dark]" 
-                    : "bg-white/10 hover:bg-white/20 border border-white/20"
+                    ? "bg-black text-white hover:bg-white hover:text-black border-2 border-black" 
+                    : "border border-zinc-400 hover:bg-zinc-100"
                 }`}
                 onClick={() => handlePurchase(plan.stripePriceId)}
               >
                 {plan.cta}
               </Button>
-            </Card>
+            </div>
           ))}
         </div>
 
         {/* FAQ Section */}
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
+          <h2 className="text-[32px] font-['Space_Grotesk'] mb-8 text-center">Frequently Asked Questions</h2>
           
           <div className="space-y-6">
             {[
@@ -208,9 +169,9 @@ export default function PricingPage() {
                 a: "Your generated videos remain yours forever. You can download them before canceling or contact support to request them."
               }
             ].map((faq, i) => (
-              <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-6">
-                <h3 className="font-semibold text-lg mb-2">{faq.q}</h3>
-                <p className="text-white/60">{faq.a}</p>
+              <div key={i} className="border border-zinc-200 rounded-lg p-6">
+                <h3 className="font-['Space_Grotesk'] font-medium text-lg mb-2">{faq.q}</h3>
+                <p className="text-zinc-500 font-['Inter']">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -218,9 +179,8 @@ export default function PricingPage() {
 
         {/* Contact CTA */}
         <div className="text-center mt-16">
-          <p className="text-white/60 mb-4">Have questions?</p>
-          <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
-            <HeadphonesIcon className="w-4 h-4 mr-2" />
+          <p className="text-zinc-500 mb-4 font-['Inter']">Have questions?</p>
+          <Button variant="outline" className="border-zinc-300 text-zinc-900 hover:bg-zinc-100">
             Contact Support
           </Button>
         </div>
